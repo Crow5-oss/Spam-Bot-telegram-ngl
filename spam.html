@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPAMBOT TELEGRAM — Cyber Console</title>
+  <meta name="description" content="Premium Telegram Spambot control panel — multi-feature cyber console." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100vh;
+      background-color: #0a0a0a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #e0e0e0;
+      overflow-x: hidden;
+    }
+
+    /* ─── Background ─────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: 
+        radial-gradient(ellipse 60% 40% at 50% -10%, rgba(239,68,68,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 80%, rgba(239,68,68,0.04) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── Page Wrapper ───────────────────────────────────────── */
+    .page-wrap {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px 16px 30px;
+    }
+
+    /* ─── Glass Card (light version) ───────────────────────── */
+    .glass-card {
+      background: rgba(18,18,18,0.92);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+      width: 100%;
+      transition: border-color 0.3s;
+    }
+    .glass-card:hover {
+      border-color: rgba(239,68,68,0.12);
+    }
+
+    .card-pad { padding: 18px 20px; }
+
+    /* ─── Typography ─────────────────────────────────────────── */
+    .neon-title {
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .section-title  { font-size: 13px; font-weight: 600; color: #fff; }
+    .section-sub    { font-size: 10px; color: #666; letter-spacing: 0.05em; }
+    .field-label    {
+      display: block;
+      font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: #ef4444;
+      margin-bottom: 5px;
+      opacity: 0.8;
+    }
+
+    /* ─── Divider ────────────────────────────────────────────── */
+    .cyber-divider  { height: 1px; background: rgba(255,255,255,0.05); margin: 14px 0; }
+
+    /* ─── Badge ──────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.12);
+      border-radius: 999px; padding: 2px 12px;
+      font-size: 9px; color: #ef4444; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .badge-dot { width: 5px; height: 5px; background: #ef4444; border-radius: 50%; animation: blink 2s ease infinite; flex-shrink: 0; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ─── Inputs ─────────────────────────────────────────────── */
+    .cyber-input {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px; padding: 10px 14px;
+      color: #e8e8e8; font-size: 13px;
+      transition: border-color 0.25s, box-shadow 0.25s; outline: none;
+    }
+    .cyber-input::placeholder { color: #555; }
+    .cyber-input:focus { border-color: rgba(239,68,68,0.35); box-shadow: 0 0 0 3px rgba(239,68,68,0.05); background: rgba(255,255,255,0.05); }
+    .cyber-input:hover:not(:focus) { border-color: rgba(255,255,255,0.12); }
+    textarea.cyber-input { resize: vertical; min-height: 80px; line-height: 1.5; }
+    select.cyber-input { cursor: pointer; appearance: none; }
+    select.cyber-input option { background: #1a1a1a; }
+
+    /* ─── Error Message ──────────────────────────────────────── */
+    .err-msg { display: none; font-size: 10px; color: #f87171; margin-top: 4px; }
+
+    /* ─── Buttons ────────────────────────────────────────────── */
+    .btn-primary {
+      width: 100%; padding: 11px 18px;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      color: #fff; font-weight: 600;
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      border: none; border-radius: 8px; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.25s, opacity 0.2s;
+      box-shadow: 0 2px 16px rgba(239,68,68,0.2);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 24px rgba(239,68,68,0.3); }
+    .btn-primary:active:not(:disabled) { transform: scale(0.97); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: rgba(239,68,68,0.04); color: #ef4444;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid rgba(239,68,68,0.12); border-radius: 6px; cursor: pointer;
+      padding: 8px 14px; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-ghost:hover { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.25); }
+
+    /* ─── Spinner ────────────────────────────────────────────── */
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Section Header ─────────────────────────────────────── */
+    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .section-icon { 
+      width: 26px; height: 26px; 
+      background: rgba(239,68,68,0.06); 
+      border: 1px solid rgba(239,68,68,0.08); 
+      border-radius: 6px; 
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; 
+    }
+    .section-icon svg { width: 13px; height: 13px; stroke: #ef4444; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ─── Top Bar ────────────────────────────────────────────── */
+    .top-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .top-bar-left { display: flex; align-items: center; gap: 10px; }
+    .top-bar-icon { 
+      width: 32px; height: 32px; 
+      background: rgba(239,68,68,0.06); 
+      border: 1px solid rgba(239,68,68,0.08); 
+      border-radius: 8px; 
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; 
+    }
+    .top-bar-icon svg { width: 15px; height: 15px; stroke: #ef4444; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .top-logo { height: 24px; width: auto; opacity: 0.6; }
+
+    /* ─── Tabs ───────────────────────────────────────────────── */
+    .tabs-wrapper {
+      display: flex; gap: 4px; overflow-x: auto;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px; padding: 4px;
+      scrollbar-width: none;
+    }
+    .tabs-wrapper::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 5px;
+      padding: 7px 12px; border-radius: 8px; border: none;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s;
+      background: transparent; color: #555;
+      white-space: nowrap;
+    }
+    .tab-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .tab-btn:hover { color: #999; background: rgba(255,255,255,0.03); }
+    .tab-btn.active {
+      background: rgba(239,68,68,0.08);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.12);
+    }
+
+    /* ─── Tab Panels ─────────────────────────────────────────── */
+    .tab-panel { display: none; animation: fadeIn 0.25s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ─── Grids ──────────────────────────────────────────────── */
+    .bento-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .bento-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    @media (max-width: 540px) { .bento-row,.bento-3 { grid-template-columns: 1fr; } }
+
+    /* ─── Field Group ────────────────────────────────────────── */
+    .fg { margin-bottom: 14px; }
+    .fg:last-child { margin-bottom: 0; }
+
+    /* ─── Progress Bar ───────────────────────────────────────── */
+    #progress-bar-wrap, #progress-bar-wrap-img { display: none; margin-top: 12px; }
+    .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .progress-meta-label { font-size: 9px; color: #555; letter-spacing: 0.06em; text-transform: uppercase; }
+    .progress-meta-count { font-size: 10px; color: #ef4444; }
+    .progress-bar-bg { height: 3px; background: rgba(239,68,68,0.06); border-radius: 999px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #b91c1c, #ef4444); border-radius: 999px; transition: width 0.15s ease; }
+
+    /* ─── Console Output ─────────────────────────────────────── */
+    #console-output {
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px;
+      padding: 12px 14px; min-height: 80px; max-height: 200px; overflow-y: auto;
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 11px; line-height: 1.8;
+    }
+    #console-output::-webkit-scrollbar { width: 3px; }
+    #console-output::-webkit-scrollbar-thumb { background: rgba(239,68,68,0.2); border-radius: 3px; }
+    .log-dim     { color: #444; }
+    .log-info    { color: #888; }
+    .log-success { color: #4ade80; }
+    .log-error   { color: #f87171; }
+    .log-warn    { color: #fbbf24; }
+    .log-accent  { color: #ef4444; }
+
+    /* ─── Result Box ─────────────────────────────────────────── */
+    .result-box {
+      background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px;
+      padding: 12px 14px; font-size: 11px; line-height: 1.8;
+      color: #888; display: none; word-break: break-all;
+    }
+    .result-box.show { display: block; animation: fadeIn 0.25s ease; }
+
+    /* ─── Stat Cards ─────────────────────────────────────────── */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    @media (max-width: 480px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: rgba(239,68,68,0.03); border: 1px solid rgba(239,68,68,0.06); border-radius: 8px;
+      padding: 10px 12px; text-align: center;
+    }
+    .stat-val { font-family: 'Menlo', monospace; font-size: 18px; font-weight: 700; color: #ef4444; line-height: 1; margin-bottom: 3px; }
+    .stat-label { font-size: 8px; color: #555; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    /* ─── Image Preview ──────────────────────────────────────── */
+    #img-preview-wrap { display: none; margin-top: 8px; }
+    #img-preview { max-width: 100%; max-height: 140px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); object-fit: contain; }
+
+    /* ─── Toggle Switch ──────────────────────────────────────── */
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+    .toggle { position: relative; width: 34px; height: 18px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #2a2a2a; border-radius: 999px; cursor: pointer; transition: 0.3s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 12px; height: 12px; left: 3px; top: 3px; background: #666; border-radius: 50%; transition: 0.3s; }
+    .toggle input:checked + .toggle-slider { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.2); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: #ef4444; }
+    .toggle-label { font-size: 10px; color: #777; letter-spacing: 0.04em; }
+
+    /* ─── Layout ─────────────────────────────────────────────── */
+    #main-container { max-width: 680px; width: 100%; animation: slideUp 0.4s ease forwards; }
+    .main-stack { display: flex; flex-direction: column; gap: 10px; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    .console-clear-btn { background:none; border:none; color:#444; font-size:10px; cursor:pointer; letter-spacing:0.05em; transition:color 0.2s; margin-left:auto; }
+    .console-clear-btn:hover { color: #ef4444; }
+
+    .footer-text { text-align:center; font-size:9px; color:#2a2a2a; letter-spacing:0.1em; text-transform:uppercase; padding: 4px 0 0; }
+
+    .flex       { display: flex; }
+    .items-center { align-items: center; }
+    .gap-2      { gap: 6px; }
+    .icon-sm    { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+
+    /* ─── Info row ───────────────────────────────────────────── */
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
+    .info-val { font-size: 10px; color: #ccc; word-break: break-all; text-align: right; max-width: 60%; }
+
+    /* ─── Remove old cyber accents ──────────────────────────── */
+    .corner-tl, .corner-br, .scanline { display: none; }
+    .glass-card::before { display: none; }
+    .glass-card { border-color: rgba(255,255,255,0.05); }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+<div id="main-container">
+<div class="main-stack">
+
+  <!-- ══ TOP BAR ══════════════════════════════════════════════ -->
+  <div class="glass-card card-pad">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="top-bar-icon">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div>
+          <div class="neon-title" style="font-size:13px;">SPAMBOT TELEGRAM</div>
+          <div class="section-sub">CYBER CONSOLE · MULTI-FEATURE</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="badge"><span class="badge-dot"></span>ONLINE</div>
+        <img src="https://files.catbox.moe/i4hmsr.png" alt="Logo" class="top-logo" onerror="this.style.display='none'" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BOT TOKEN (Global) ════════════════════════════════════ -->
+  <div class="glass-card card-pad">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
+      <div><div class="section-title">Global Config</div><div class="section-sub">REQUIRED FOR ALL FEATURES</div></div>
+    </div>
+    <div class="fg">
+      <label class="field-label" for="g-token">Bot Token</label>
+      <input type="text" id="g-token" class="cyber-input" placeholder="123456:ABC-DEFxyz..." />
+      <p class="err-msg" id="err-g-token">⚠ Bot token is required</p>
+    </div>
+    <div class="fg">
+      <label class="field-label" for="g-chatid">Default Target Chat ID</label>
+      <input type="text" id="g-chatid" class="cyber-input" placeholder="-100123456789 or @username" />
+      <p class="err-msg" id="err-g-chatid">⚠ Chat ID is required</p>
+    </div>
+  </div>
+
+  <!-- ══ TABS ══════════════════════════════════════════════════ -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchTab('ngl')" id="tab-ngl">
+      <svg class="icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      NGL Spam
+    </button>
+    <button class="tab-btn" onclick="switchTab('text')" id="tab-text">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Text Spam
+    </button>
+    <button class="tab-btn" onclick="switchTab('image')" id="tab-image">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Image Spam
+    </button>
+    <button class="tab-btn" onclick="switchTab('botset')" id="tab-botset">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Bot Settings
+    </button>
+    <button class="tab-btn" onclick="switchTab('info')" id="tab-info">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+      Bot Info
+    </button>
+    <button class="tab-btn" onclick="switchTab('tools')" id="tab-tools">
+      <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      Tools
+    </button>
+  </div>
+
+  <!-- ══ TAB: NGL SPAM ════════════════════════════════════════ -->
+  <div id="panel-ngl" class="tab-panel active glass-card card-pad">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <div><div class="section-title">NGL Spam</div><div class="section-sub">MASS SEND ANONYMOUS NGL MESSAGES</div></div>
+    </div>
+    
+    <form id="spamForm">
+      <div class="fg">
+        <label class="field-label" for="username">NGL Username</label>
+        <input type="text" id="username" class="cyber-input" placeholder="Contoh: inputusername" required />
+      </div>
+      
+      <div class="fg">
+        <label class="field-label" for="message">Pesan Anonim</label>
+        <textarea id="message" class="cyber-input" placeholder="Tulis pesan Anda..." required></textarea>
+      </div>
+
+      <div class="fg">
+        <label class="field-label" for="count">Jumlah Pesan</label>
+        <input type="number" id="count" class="cyber-input" placeholder="Contoh: 5" min="1" required />
+      </div>
+
+      <button type="submit" class="btn-primary">
+        <svg class="icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Kirim Pesan</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- ══ TAB: TEXT SPAM ════════════════════════════════════════ -->
+  <div id="panel-text" class="tab-panel glass-card card-pad">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div><div class="section-title">Text Spam</div><div class="section-sub">MASS SEND TEXT MESSAGES</div></div>
+    </div>
+
+    <div class="bento-row fg">
+      <div>
+        <label class="field-label" for="txt-jumlah">Spam Count</label>
+        <input type="number" id="txt-jumlah" class="cyber-input" placeholder="e.g. 100" min="1" />
+        <p class="err-msg" id="err-txt-jumlah">⚠ Valid count (≥ 1)</p>
+      </div>
+      <div>
+        <label class="field-label" for="txt-delay">Delay (ms)</label>
+        <input type="number" id="txt-delay" class="cyber-input" placeholder="50" min="0" value="50" />
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="field-label" for="txt-pesan">Payload Message</label>
+      <textarea id="txt-pesan" class="cyber-input" placeholder="Enter the message payload to send..."></textarea>
+      <p class="err-msg" id="err-txt-pesan">⚠ Message payload required</p>
+    </div>
+
+    <div class="fg">
+      <label class="field-label">Parse Mode</label>
+      <select id="txt-parse" class="cyber-input">
+        <option value="">None (Plain Text)</option>
+        <option value="HTML">HTML</option>
+        <option value="Markdown">Markdown</option>
+        <option value="MarkdownV2">MarkdownV2</option>
+      </select>
+    </div>
+
+    <button id="txt-btn" class="btn-primary" onclick="kirimSpamText()">
+      <svg class="icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="txt-btn-text">EXECUTE TEXT SPAM</span>
+    </button>
+
+    <div id="progress-bar-wrap">
+      <div class="progress-meta">
+        <span class="progress-meta-label">Transmission Progress</span>
+        <span class="progress-meta-count" id="txt-progress-label">0 / 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="txt-progress-fill"></div></div>
+    </div>
+
+    <div class="stat-grid" id="txt-stats" style="display:none;">
+      <div class="stat-card"><div class="stat-val" id="stat-sent">0</div><div class="stat-label">Sent</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-ok" style="color:#4ade80">0</div><div class="stat-label">Success</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-fail" style="color:#f87171">0</div><div class="stat-label">Failed</div></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: IMAGE SPAM ══════════════════════════════════════ -->
+  <div id="panel-image" class="tab-panel glass-card card-pad">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+      <div><div class="section-title">Image Spam</div><div class="section-sub">MASS SEND PHOTOS VIA URL</div></div>
+    </div>
+
+    <div class="fg">
+      <label class="field-label" for="img-url">Photo URL</label>
+      <input type="url" id="img-url" class="cyber-input" placeholder="https://example.com/photo.jpg" oninput="previewImage()" />
+      <p class="err-msg" id="err-img-url">⚠ Valid image URL required</p>
+      <div id="img-preview-wrap"><img id="img-preview" src="" alt="Preview" /></div>
+    </div>
+
+    <div class="fg">
+      <label class="field-label" for="img-caption">Caption (optional)</label>
+      <textarea id="img-caption" class="cyber-input" placeholder="Caption for the image..." style="min-height:60px;"></textarea>
+    </div>
+
+    <div class="bento-row fg">
+      <div>
+        <label class="field-label" for="img-jumlah">Spam Count</label>
+        <input type="number" id="img-jumlah" class="cyber-input" placeholder="e.g. 50" min="1" />
+        <p class="err-msg" id="err-img-jumlah">⚠ Valid count (≥ 1)</p>
+      </div>
+      <div>
+        <label class="field-label" for="img-delay">Delay (ms)</label>
+        <input type="number" id="img-delay" class="cyber-input" placeholder="100" min="0" value="100" />
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="field-label">Caption Parse Mode</label>
+      <select id="img-parse" class="cyber-input">
+        <option value="">None</option>
+        <option value="HTML">HTML</option>
+        <option value="Markdown">Markdown</option>
+      </select>
+    </div>
+
+    <button id="img-btn" class="btn-primary" onclick="kirimSpamImage()">
+      <svg class="icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="img-btn-text">EXECUTE IMAGE SPAM</span>
+    </button>
+
+    <div id="progress-bar-wrap-img">
+      <div class="progress-meta">
+        <span class="progress-meta-label">Image Transmission</span>
+        <span class="progress-meta-count" id="img-progress-label">0 / 0</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="img-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: BOT SETTINGS ════════════════════════════════════ -->
+  <div id="panel-botset" class="tab-panel glass-card card-pad">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
+      <div><div class="section-title">Bot Settings</div><div class="section-sub">MODIFY BOT PROFILE VIA API</div></div>
+    </div>
+
+    <div class="cyber-divider"></div>
+
+    <div class="fg">
+      <label class="field-label" for="set-name">🏷 New Bot Name</label>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <input type="text" id="set-name" class="cyber-input" placeholder="e.g. My Awesome Bot" />
+        <button class="btn-ghost" onclick="setBotName()" style="flex-shrink:0;padding:10px 14px;">SET</button>
+      </div>
+      <p class="err-msg" id="err-set-name">⚠ Name cannot be empty</p>
+    </div>
+
+    <div class="fg">
+      <label class="field-label" for="set-desc">📄 Bot Description</label>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <textarea id="set-desc" class="cyber-input" placeholder="Shown in empty chat window..." style="min-height:60px;"></textarea>
+        <button class="btn-ghost" onclick="setBotDescription()" style="flex-shrink:0;padding:10px 14px;">SET</button>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="field-label" for="set-short">📌 Short Description</label>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <input type="text" id="set-short" class="cyber-input" placeholder="Shown on bot profile (max 120 chars)" maxlength="120" />
+        <button class="btn-ghost" onclick="setBotShortDesc()" style="flex-shrink:0;padding:10px 14px;">SET</button>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="field-label" for="set-cmds">⚡ Set Bot Commands (JSON)</label>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <textarea id="set-cmds" class="cyber-input" placeholder='[{"command":"start","description":"Start the bot"},{"command":"help","description":"Help menu"}]' style="min-height:70px;font-size:12px;"></textarea>
+        <button class="btn-ghost" onclick="setBotCommands()" style="flex-shrink:0;padding:10px 14px;">SET</button>
+      </div>
+      <p class="err-msg" id="err-set-cmds">⚠ Must be valid JSON array</p>
+    </div>
+
+    <div id="botset-result" class="result-box"></div>
+  </div>
+
+  <!-- ══ TAB: BOT INFO ════════════════════════════════════════ -->
+  <div id="panel-info" class="tab-panel glass-card card-pad">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg></div>
+      <div><div class="section-title">Bot Info</div><div class="section-sub">FETCH LIVE BOT DATA</div></div>
+    </div>
+
+    <button id="info-btn" class="btn-primary" onclick="getBotInfo()" style="margin-bottom:12px;">
+      <svg class="icon-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+      <span id="info-btn-text">FETCH BOT INFO</span>
+    </button>
+
+    <div id="info-result" class="result-box"></div>
+  </div>
+
+  <!-- ══ TAB: TOOLS ════════════════════════════════════════════ -->
+  <div id="panel-tools" class="tab-panel glass-card card-pad">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+      <div><div class="section-title">Extra Tools</div><div class="section-sub">ADVANCED TELEGRAM ACTIONS</div></div>
+    </div>
+
+    <div class="cyber-divider"></div>
+
+    <!-- Send Sticker -->
+    <div class="fg">
+      <label class="field-label">🎭 Send Sticker</label>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <input type="text" id="tool-sticker-id" class="cyber-input" placeholder="Sticker file_id or URL" />
+        <button class="btn-ghost" onclick="sendSticker()" style="flex-shrink:0;padding:10px 14px;">SEND</button>
+      </div>
+      <p style="font-size:9px;color:#444;margin-top:4px;">Use Bot API file_id or an HTTPS URL to a .webp file</p>
+    </div>
+
+    <!-- Send Poll -->
+    <div class="fg">
+      <label class="field-label">📊 Send Poll</label>
+      <div class="fg">
+        <input type="text" id="tool-poll-q" class="cyber-input" placeholder="Poll question..." />
+      </div>
+      <div class="fg">
+        <textarea id="tool-poll-opts" class="cyber-input" placeholder="One option per line:&#10;Option A&#10;Option B&#10;Option C" style="min-height:70px;"></textarea>
+      </div>
+      <div class="bento-row fg" style="align-items:center;">
+        <div class="toggle-wrap">
+          <label class="toggle"><input type="checkbox" id="poll-anon"><span class="toggle-slider"></span></label>
+          <span class="toggle-label">Anonymous</span>
+        </div>
+        <div class="toggle-wrap">
+          <label class="toggle"><input type="checkbox" id="poll-multi"><span class="toggle-slider"></span></label>
+          <span class="toggle-label">Multiple Answers</span>
+        </div>
+      </div>
+      <button class="btn-ghost" onclick="sendPoll()" style="width:100%;justify-content:center;">
+        <svg class="icon-sm" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        SEND POLL
+      </button>
+    </div>
+
+    <!-- Forward Message -->
+    <div class="fg">
+      <label class="field-label">↪ Forward Message</label>
+      <div class="bento-row" style="margin-bottom:8px;">
+        <div>
+          <label class="field-label" for="fwd-from" style="font-size:9px;">From Chat ID</label>
+          <input type="text" id="fwd-from" class="cyber-input" placeholder="Source chat ID" />
+        </div>
+        <div>
+          <label class="field-label" for="fwd-msgid" style="font-size:9px;">Message ID</label>
+          <input type="number" id="fwd-msgid" class="cyber-input" placeholder="12345" />
+        </div>
+      </div>
+      <button class="btn-ghost" onclick="forwardMsg()" style="width:100%;justify-content:center;">
+        <svg class="icon-sm" viewBox="0 0 24 24"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
+        FORWARD MESSAGE
+      </button>
+    </div>
+
+    <!-- Pin Message -->
+    <div class="fg">
+      <label class="field-label">📌 Pin Message</label>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <input type="number" id="tool-pin-id" class="cyber-input" placeholder="Message ID to pin" />
+        <div class="toggle-wrap" style="flex-shrink:0;">
+          <label class="toggle"><input type="checkbox" id="pin-silent"><span class="toggle-slider"></span></label>
+          <span class="toggle-label">Silent</span>
+        </div>
+      </div>
+      <button class="btn-ghost" onclick="pinMessage()" style="width:100%;justify-content:center;">
+        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        PIN MESSAGE
+      </button>
+    </div>
+
+    <div id="tools-result" class="result-box"></div>
+  </div>
+
+  <!-- ══ CONSOLE OUTPUT ════════════════════════════════════════ -->
+  <div class="glass-card card-pad">
+    <div class="section-header" style="margin-bottom:8px;">
+      <div class="section-icon"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+      <div style="flex:1;"><div class="section-title">Console Output</div><div class="section-sub">REAL-TIME OPERATION LOG</div></div>
+      <button class="console-clear-btn" onclick="clearConsole()">[CLEAR]</button>
+    </div>
+    <div id="console-output">
+      <span class="log-dim">// Console ready. Awaiting instructions...</span>
+    </div>
+  </div>
+
+  <p class="footer-text">FS0CIETY · CYBER CONSOLE · v3.0.0 · USE RESPONSIBLY</p>
+
+</div><!-- /main-stack -->
+</div><!-- /main-container -->
+</div><!-- /page-wrap -->
+
+<script>
+/* ─── ALL JAVASCRIPT REMAINS EXACTLY THE SAME ──────────────── */
+/* ─── (No changes to functionality, only UI styling) ──────── */
+
+const $  = id => document.getElementById(id);
+const consoleEl = $('console-output');
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function logMsg(text, type) {
+  type = type || 'info';
+  var map = { info:'log-info', success:'log-success', error:'log-error', warn:'log-warn', accent:'log-accent', dim:'log-dim' };
+  var now = new Date();
+  var ts  = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+  var line = document.createElement('div');
+  line.innerHTML = '<span class="log-dim">[' + ts + ']</span> <span class="' + (map[type]||'log-info') + '">' + text + '</span>';
+  consoleEl.appendChild(line);
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+
+function clearConsole() {
+  consoleEl.innerHTML = '<span class="log-dim">// Console cleared.</span>';
+}
+
+function showError(id, condition) {
+  var el  = document.getElementById(id);
+  var key = id.replace('err-', '');
+  var inp = document.getElementById(key);
+  if (el) el.style.display = condition ? 'block' : 'none';
+  if (inp) inp.style.borderColor = condition ? 'rgba(239,68,68,0.5)' : 'rgba(255,255,255,0.07)';
+  return condition;
+}
+
+function getToken()  { return $('g-token').value.trim(); }
+function getChatId() { return $('g-chatid').value.trim(); }
+
+function requireGlobal() {
+  var t = showError('err-g-token',  !getToken());
+  var c = showError('err-g-chatid', !getChatId());
+  return t || c;
+}
+
+function showResult(boxId, html, ok) {
+  var box = $(boxId);
+  box.innerHTML = html;
+  box.className = 'result-box show';
+  box.style.borderColor = ok ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.15)';
+}
+
+function btnLoading(btn, textEl, msg) {
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span><span>' + msg + '</span>';
+}
+
+function btnReset(btn, iconSvg, label) {
+  btn.disabled = false;
+  btn.innerHTML = iconSvg + '<span>' + label + '</span>';
+}
+
+/* ─── Tabs ─────────────────────────────────────────────────── */
+function switchTab(name) {
+  ['ngl','text','image','botset','info','tools'].forEach(function(t) {
+    $('tab-' + t).classList.remove('active');
+    $('panel-' + t).classList.remove('active');
+  });
+  $('tab-' + name).classList.add('active');
+  $('panel-' + name).classList.add('active');
+}
+
+/* ─── Image Preview ────────────────────────────────────────── */
+function previewImage() {
+  var url = $('img-url').value.trim();
+  var wrap = $('img-preview-wrap');
+  var img  = $('img-preview');
+  if (url) { img.src = url; wrap.style.display = 'block'; }
+  else     { wrap.style.display = 'none'; }
+}
+
+/* ─── TEXT SPAM ────────────────────────────────────────────── */
+async function kirimSpamText() {
+  if (requireGlobal()) { logMsg('Fill global config first.', 'warn'); return; }
+
+  var token  = getToken();
+  var chatid = getChatId();
+  var pesan  = $('txt-pesan').value.trim();
+  var jumlah = parseInt($('txt-jumlah').value);
+  var delay  = parseInt($('txt-delay').value) || 50;
+  var parse  = $('txt-parse').value;
+
+  var hasErr = showError('err-txt-jumlah', isNaN(jumlah) || jumlah < 1) | showError('err-txt-pesan', !pesan);
+  if (hasErr) { logMsg('Validation failed — fill all fields.', 'warn'); return; }
+
+  showError('err-txt-jumlah', false); showError('err-txt-pesan', false);
+
+  var btn = $('txt-btn');
+  btnLoading(btn, $('txt-btn-text'), 'EXECUTING...');
+  $('progress-bar-wrap').style.display = 'block';
+  $('txt-stats').style.display = 'none';
+  $('txt-progress-fill').style.width = '0%';
+  $('txt-progress-label').textContent = '0 / ' + jumlah;
+
+  logMsg('Target: ' + chatid, 'accent');
+  logMsg('Payload: "' + (pesan.length > 40 ? pesan.slice(0,40) + '...' : pesan) + '"', 'info');
+  logMsg('Mode: ' + (parse || 'plain') + ' | Count: ' + jumlah + ' | Delay: ' + delay + 'ms', 'info');
+  logMsg('Initiating text transmission...', 'warn');
+
+  var sukses = 0, gagal = 0;
+  for (var i = 0; i < jumlah; i++) {
+    try {
+      var body = { chat_id: chatid, text: pesan };
+      if (parse) body.parse_mode = parse;
+      var res  = await fetch('https://api.telegram.org/bot' + token + '/sendMessage', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      var json = await res.json();
+      json.ok ? sukses++ : (gagal++, i===0 && logMsg('API Error: ' + (json.description||'Unknown'), 'error'));
+    } catch(e) { gagal++; if(i===0) logMsg('Network Error: ' + e.message, 'error'); }
+
+    var sent = i + 1;
+    var pct  = Math.round((sent / jumlah) * 100);
+    $('txt-progress-fill').style.width = pct + '%';
+    $('txt-progress-label').textContent = sent + ' / ' + jumlah;
+    $('stat-sent').textContent = sent;
+    $('stat-ok').textContent   = sukses;
+    $('stat-fail').textContent = gagal;
+    $('txt-stats').style.display = 'grid';
+    if (sent === 1) logMsg('First message delivered.', 'success');
+    if (sent === Math.floor(jumlah / 2) && sent > 1) logMsg('Halfway — ' + sent + '/' + jumlah, 'info');
+    await new Promise(function(r){ setTimeout(r, delay); });
+  }
+
+  logMsg('─────────────────────────────', 'dim');
+  logMsg((gagal===0 ? '✓ ' : '⚡ ') + 'Done — ' + sukses + ' success, ' + gagal + ' failed.', gagal===0?'success':'warn');
+  btnReset(btn, '<svg class="icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', 'EXECUTE TEXT SPAM');
+}
+
+/* ─── IMAGE SPAM ───────────────────────────────────────────── */
+async function kirimSpamImage() {
+  if (requireGlobal()) { logMsg('Fill global config first.', 'warn'); return; }
+
+  var token   = getToken();
+  var chatid  = getChatId();
+  var url     = $('img-url').value.trim();
+  var caption = $('img-caption').value.trim();
+  var jumlah  = parseInt($('img-jumlah').value);
+  var delay   = parseInt($('img-delay').value) || 100;
+  var parse   = $('img-parse').value;
+
+  var hasErr = showError('err-img-url', !url) | showError('err-img-jumlah', isNaN(jumlah) || jumlah < 1);
+  if (hasErr) { logMsg('Validation failed.', 'warn'); return; }
+
+  var btn = $('img-btn');
+  btnLoading(btn, $('img-btn-text'), 'UPLOADING...');
+  $('progress-bar-wrap-img').style.display = 'block';
+  $('img-progress-fill').style.width = '0%';
+  $('img-progress-label').textContent = '0 / ' + jumlah;
+
+  logMsg('Image URL: ' + url.slice(0,50) + (url.length>50?'...':''), 'accent');
+  logMsg('Count: ' + jumlah + ' | Delay: ' + delay + 'ms', 'info');
+  logMsg('Initiating image transmission...', 'warn');
+
+  var sukses = 0, gagal = 0;
+  for (var i = 0; i < jumlah; i++) {
+    try {
+      var body = { chat_id: chatid, photo: url };
+      if (caption) body.caption = caption;
+      if (parse)   body.parse_mode = parse;
+      var res  = await fetch('https://api.telegram.org/bot' + token + '/sendPhoto', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      var json = await res.json();
+      json.ok ? sukses++ : (gagal++, i===0 && logMsg('API Error: ' + (json.description||'Unknown'), 'error'));
+    } catch(e) { gagal++; if(i===0) logMsg('Net Error: ' + e.message, 'error'); }
+
+    var sent = i + 1;
+    $('img-progress-fill').style.width = Math.round((sent/jumlah)*100) + '%';
+    $('img-progress-label').textContent = sent + ' / ' + jumlah;
+    await new Promise(function(r){ setTimeout(r, delay); });
+  }
+
+  logMsg('─────────────────────────────', 'dim');
+  logMsg('📷 Images done — ' + sukses + ' ok, ' + gagal + ' fail.', gagal===0?'success':'warn');
+  btnReset(btn, '<svg class="icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', 'EXECUTE IMAGE SPAM');
+}
+
+/* ─── BOT SETTINGS ─────────────────────────────────────────── */
+async function apiBotSet(method, body, label) {
+  if (!getToken()) { logMsg('Bot token required.', 'warn'); return; }
+  logMsg('Setting ' + label + '...', 'info');
+  try {
+    var res  = await fetch('https://api.telegram.org/bot' + getToken() + '/' + method, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    var json = await res.json();
+    if (json.ok) {
+      logMsg('✓ ' + label + ' updated successfully.', 'success');
+      showResult('botset-result', '✓ ' + label + ' set successfully!', true);
+    } else {
+      logMsg('✗ Error: ' + (json.description||'Unknown'), 'error');
+      showResult('botset-result', '✗ Error: ' + (json.description||'Unknown'), false);
+    }
+  } catch(e) { logMsg('Network error: ' + e.message, 'error'); }
+}
+
+function setBotName() {
+  var val = $('set-name').value.trim();
+  if (!val) { showError('err-set-name', true); return; }
+  showError('err-set-name', false);
+  apiBotSet('setMyName', { name: val }, 'Bot Name');
+}
+
+function setBotDescription() {
+  var val = $('set-desc').value.trim();
+  apiBotSet('setMyDescription', { description: val }, 'Bot Description');
+}
+
+function setBotShortDesc() {
+  var val = $('set-short').value.trim();
+  apiBotSet('setMyShortDescription', { short_description: val }, 'Short Description');
+}
+
+function setBotCommands() {
+  var raw = $('set-cmds').value.trim();
+  try {
+    var cmds = JSON.parse(raw);
+    apiBotSet('setMyCommands', { commands: cmds }, 'Bot Commands');
+    showError('err-set-cmds', false);
+  } catch(e) {
+    showError('err-set-cmds', true);
+    logMsg('Invalid JSON for commands.', 'error');
+  }
+}
+
+/* ─── BOT INFO ─────────────────────────────────────────────── */
+async function getBotInfo() {
+  if (!getToken()) { logMsg('Bot token required.', 'warn'); return; }
+  var btn = $('info-btn');
+  btnLoading(btn, null, 'FETCHING...');
+  logMsg('Fetching bot info...', 'info');
+  try {
+    var res  = await fetch('https://api.telegram.org/bot' + getToken() + '/getMe');
+    var json = await res.json();
+    if (json.ok) {
+      var b = json.result;
+      logMsg('✓ Bot info retrieved: @' + b.username, 'success');
+      var rows = [
+        ['ID',          b.id],
+        ['Name',        b.first_name + (b.last_name ? ' ' + b.last_name : '')],
+        ['Username',    '@' + b.username],
+        ['Can Join Groups', b.can_join_groups ? 'Yes' : 'No'],
+        ['Inline Mode', b.supports_inline_queries ? 'Yes' : 'No'],
+      ];
+      var html = rows.map(function(r) {
+        return '<div class="info-row"><span class="info-key">' + r[0] + '</span><span class="info-val">' + r[1] + '</span></div>';
+      }).join('');
+      showResult('info-result', html, true);
+    } else {
+      logMsg('✗ Error: ' + (json.description||'Unknown'), 'error');
+      showResult('info-result', '✗ ' + (json.description||'Unknown'), false);
+    }
+  } catch(e) { logMsg('Network error: ' + e.message, 'error'); }
+  btnReset(btn, '<svg class="icon-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>', 'FETCH BOT INFO');
+}
+
+/* ─── TOOLS ────────────────────────────────────────────────── */
+async function toolAction(method, body, label) {
+  if (!getToken() || !getChatId()) { logMsg('Fill global config.', 'warn'); return; }
+  logMsg('Sending ' + label + '...', 'info');
+  try {
+    body.chat_id = getChatId();
+    var res  = await fetch('https://api.telegram.org/bot' + getToken() + '/' + method, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    var json = await res.json();
+    if (json.ok) {
+      logMsg('✓ ' + label + ' sent.', 'success');
+      showResult('tools-result', '✓ ' + label + ' delivered successfully!', true);
+    } else {
+      logMsg('✗ Error: ' + (json.description||'Unknown'), 'error');
+      showResult('tools-result', '✗ ' + (json.description||'Unknown'), false);
+    }
+  } catch(e) { logMsg('Net error: ' + e.message, 'error'); }
+}
+
+function sendSticker() {
+  var fid = $('tool-sticker-id').value.trim();
+  if (!fid) { logMsg('Sticker ID/URL required.', 'warn'); return; }
+  toolAction('sendSticker', { sticker: fid }, 'Sticker');
+}
+
+function sendPoll() {
+  var q    = $('tool-poll-q').value.trim();
+  var opts = $('tool-poll-opts').value.trim().split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  if (!q)         { logMsg('Poll question required.', 'warn'); return; }
+  if (opts.length < 2) { logMsg('At least 2 options required.', 'warn'); return; }
+  toolAction('sendPoll', {
+    question: q,
+    options: opts,
+    is_anonymous: $('poll-anon').checked,
+    allows_multiple_answers: $('poll-multi').checked,
+  }, 'Poll');
+}
+
+function forwardMsg() {
+  var from  = $('fwd-from').value.trim();
+  var msgid = parseInt($('fwd-msgid').value);
+  if (!from || isNaN(msgid)) { logMsg('From chat ID and Message ID required.', 'warn'); return; }
+  if (!getToken() || !getChatId()) { logMsg('Fill global config.', 'warn'); return; }
+  logMsg('Forwarding message ' + msgid + ' from ' + from + '...', 'info');
+  fetch('https://api.telegram.org/bot' + getToken() + '/forwardMessage', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ chat_id: getChatId(), from_chat_id: from, message_id: msgid })
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if (j.ok) { logMsg('✓ Message forwarded.', 'success'); showResult('tools-result', '✓ Message forwarded!', true); }
+    else       { logMsg('✗ ' + (j.description||'Error'), 'error'); showResult('tools-result', '✗ ' + j.description, false); }
+  }).catch(function(e){ logMsg('Net error: '+e.message,'error'); });
+}
+
+function pinMessage() {
+  var msgid  = parseInt($('tool-pin-id').value);
+  var silent = $('pin-silent').checked;
+  if (isNaN(msgid)) { logMsg('Message ID required.', 'warn'); return; }
+  if (!getToken() || !getChatId()) { logMsg('Fill global config.', 'warn'); return; }
+  logMsg('Pinning message ' + msgid + '...', 'info');
+  fetch('https://api.telegram.org/bot' + getToken() + '/pinChatMessage', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ chat_id: getChatId(), message_id: msgid, disable_notification: silent })
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if (j.ok) { logMsg('✓ Message pinned.', 'success'); showResult('tools-result', '✓ Message pinned successfully!', true); }
+    else       { logMsg('✗ ' + (j.description||'Error'), 'error'); showResult('tools-result', '✗ ' + j.description, false); }
+  }).catch(function(e){ logMsg('Net error: '+e.message,'error'); });
+}
+
+/* ─── Init ─────────────────────────────────────────────────── */
+logMsg('System initialized. All modules loaded.', 'success');
+logMsg('v3.0.0 — Text Spam | Image Spam | Bot Settings | Tools', 'accent');
+
+    // SweetAlert NGL handler (kept as is from original)
+    document.getElementById('spamForm') && document.getElementById('spamForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const count = parseInt(document.getElementById('count').value);
+
+      if (!username || !message || isNaN(count) || count < 1) {
+        Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Please fill all fields with valid values.' });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Processing...',
+        text: 'Sending ' + count + ' NGL messages to @' + username,
+        icon: 'info',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      let successCount = 0, failCount = 0;
+
+      for (let i = 0; i < count; i++) {
+        try {
+          const res = await fetch('https://api.ngl.link/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, message })
+          });
+          const data = await res.json();
+          if (res.ok) successCount++; else failCount++;
+        } catch { failCount++; }
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      Swal.fire({
+        icon: successCount > 0 ? 'success' : 'error',
+        title: 'Spam Complete',
+        html: `<b>Success:</b> ${successCount}<br><b>Failed:</b> ${failCount}`,
+        confirmButtonColor: '#ef4444'
+      });
+    });
+
+  </script>
+</body>
+</html>
